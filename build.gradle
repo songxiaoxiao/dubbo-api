@@ -1,0 +1,70 @@
+plugins {
+	id 'org.springframework.boot' version '2.1.3.RELEASE'
+	id 'java'
+	id 'maven'
+	id 'maven-publish'
+}
+
+apply plugin: 'io.spring.dependency-management'
+
+group = 'com.winter.api'
+version = '0.0.2-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+
+
+def artifactId = 'api-api'
+description = 'api-api'
+
+//snapshots
+def envRepos = System.getProperty("env") ?: "snapshots"
+
+
+install{
+	repositories.mavenInstaller{
+		pom.version = "$project.version"
+		pom.artifactId = "$artifactId"
+		pom.groupId = "$project.group"
+	}
+}
+
+
+publishing {
+	publications {
+		maven(MavenPublication) {
+			artifact("build/libs/provider-0.0.2-SNAPSHOT.jar") {
+				extension 'jar'
+			}
+		}
+	}
+	repositories {
+		maven {
+			name 'api-api'
+			url "http://localhost:8081/repository/maven-snapshots/$envRepos"
+			credentials {
+				username = "winter"
+				password = "123456"
+			}
+		}
+	}
+}
+
+
+repositories {
+	mavenCentral()
+
+	mavenLocal()
+	maven {
+		url 'http://localhost:8081/repository/maven-snapshots/'
+		credentials {
+			username = "winter"
+			password = "123456"
+		}
+	}
+	maven {url 'http://maven.aliyun.com/nexus/content/groups/public/'}
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
